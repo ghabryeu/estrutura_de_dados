@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Definição do tipo link como ponteiro para struct node
+typedef struct node* link;
+
+// Definição da estrutura node
+struct node{ 
+    char item; 
+    link next; // Ponteiro para o próximo nó
+};
+
+// Estrutura chamada PILHA para representar a pilha
+typedef struct{
+  link topo; // Ponteiro para o topo da pilha
+} PILHA;
+
+// Função para inicializar a pilha vazia
+void inicializar(PILHA *p){
+  p->topo = NULL; // Indica que a pilha está vazia
+}
+
+// Função para empilhar (push) um elemento na pilha
+void empilhar(PILHA *p, char x){
+  link novoNode = (link) malloc(sizeof(struct node)); // Aloca novo nó
+  novoNode->item = x; // Armazena x no novo nó
+  novoNode->next = p->topo; // O novo nó aponta para o topo da pilha
+  p->topo = novoNode; // O topo da pilha aponta para o novo nó  
+}
+
+// Função para desempilhar (pop) um elemento da pilha
+char desempilhar(PILHA *p){
+  if (p->topo == NULL) { // Verifica se a pilha está vazia
+     printf("Pilha Vazia!\n");
+     return '\0'; // Retorna caractere nulo se a pilha estiver vazia
+  } else { // A pilha tem pelo menos um elemento
+     char t = p->topo->item; // Faz uma cópia do elemento no topo
+     link tmp = p->topo; // Guarda o endereço do topo
+     p->topo = p->topo->next; // Atualiza o topo para o próximo
+     free(tmp);
+     return t;
+  }
+}
+
+// Função para verificar se a string é da forma WcM
+int verificaFormatoWcM(char *x) {
+    PILHA p;
+    inicializar(&p);
+    int len = strlen(x);
+    int meio = len / 2;
+
+    // Verifica se o caractere do meio é 'c'
+    if (x[meio] != 'c') {
+        return 0; // Não é da forma WcM
+    }
+
+    // Empilha os caracteres de W
+    for (int i = 0; i < meio; i++) {
+        if (x[i] != 'a' && x[i] != 'b') {
+            return 0; // Caractere inválido
+        }
+        empilhar(&p, x[i]);
+    }
+
+    // Compara os caracteres de M com os desempilhados de W
+    for (int i = meio + 1; i < len; i++) {
+        char t = desempilhar(&p);
+        if (t != x[i]) {
+            return 0; // Não é o inverso
+        }
+    }
+
+    return 1; // É da forma WcM
+}
+
+int main(void) {
+    char x[100];
+    printf("Digite a string: ");
+    scanf("%s", x);
+
+    if (verificaFormatoWcM(x)) {
+        printf("A string '%s' é da forma WcM.\n", x);
+    } else {
+        printf("A string '%s' NÃO é da forma WcM.\n", x);
+    }
+
+    return 0;
+}
